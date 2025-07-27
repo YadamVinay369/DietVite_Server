@@ -1,0 +1,34 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment variables
+.env
+.venv
+
+# Virtual environment
+venv/
+env/
+
+# VSCode settings (optional, if using VSCode)
+.vscode/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Uvicorn reload artifacts
+*.reload
+
+# Python egg files
+*.egg-info/
+
+# Database files
+*.sqlite3
+
+# Pydantic compiled models (if any)
+*.pyd
