@@ -1,15 +1,16 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from utils.route_checkup import get_current_user
 
 router = APIRouter()
 
 @router.post('/missy_monitor')
-def check_skips():
+def check_skips(current_user: dict = Depends(get_current_user)):
     '''
     1. check for skip dates,
     if found then call missymonitor that return yield messages
     2. update the start date in database
     '''
-    pass
+    return {"msg":f"Access granted to {current_user['email']}"}
 
 @router.post('/query')
 def query():
