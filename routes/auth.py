@@ -1,10 +1,10 @@
 from schemas.user import UserCreate, UserPublic
-from utils.db import db
+from utils.db_utils.db import db
 from passlib.context import CryptContext
 from bson import ObjectId
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
-from utils.jwt_create_validate import create_access_token
+from utils.auth_utils.jwt_create_validate import create_access_token
 
 router = APIRouter()
 pwd_context = CryptContext(schemes=['bcrypt'],deprecated='auto')
