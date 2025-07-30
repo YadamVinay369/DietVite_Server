@@ -17,7 +17,6 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         user = await db.users.find_one({"_id": ObjectId(user_id)})
         if user is None:
             raise HTTPException(status_code=404, detail="User not found")
-        print(user)
         return user_id
     except HTTPException as e:
         raise e
