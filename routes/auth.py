@@ -50,7 +50,8 @@ async def login(user: UserCreate):
             "user":{
                 "id": str(db_user["_id"]),
                 "username": db_user["username"],
-                "email": db_user["email"]
+                "email": db_user["email"],
+                "overall_nutrients_sheet": db_user["overall_nutrient_sheet"]
             }
         }
     )
