@@ -19,10 +19,8 @@ def query(system_message, user_query):
 
         random_index_api_key = random.randint(0, len(api_keys) - 1)
         client = Groq(api_key=api_keys[random_index_api_key])
-        print("random api index: ",random_index_api_key)
-        models = ["llama-3.1-8b-instant", "meta-llama/llama-guard-4-12b"]
+        models = ["llama-3.1-8b-instant", "llama-3.3-70b-versatile"]
         random_index_model = random.randint(0, len(models) - 1)
-
         response = client.chat.completions.create(
             model=models[random_index_model],
             messages=messages,
@@ -55,13 +53,13 @@ def update(overall_nutrient_intake_sheet,nutrient_sheet_per_food_item):
 
 def nutri_orchestrator(user_query):
     classification_prompt = os.getenv("CLASSIFICATION_PROMPT").format(user_query=user_query)
-    classification_system_message = os.getenv("CLASSIFICATION_SYSTEM_PROMPT ")
+    classification_system_message = os.getenv("CLASSIFICATION_SYSTEM_PROMPT")
     return query(system_message=classification_system_message, user_query=classification_prompt)
 
-def omni_knowlege_bot(user_query):
-    omni_knowlege_bot_prompt = os.getenv("OMNI_KNOWLEDGE_BOT_PROMPT").format(user_query=user_query)
-    omni_knowlege_bot_system_message = os.getenv("OMNI_KNOWLEDGE_BOT_SYSYTEM_MESSAGE")
-    return query(system_message=omni_knowlege_bot_system_message, user_query=omni_knowlege_bot_prompt)
+def omni_knowledge_bot(user_query):
+    omni_knowledge_bot_prompt = os.getenv("OMNI_KNOWLEDGE_BOT_PROMPT").format(user_query=user_query)
+    omni_knowledge_bot_system_message = os.getenv("OMNI_KNOWLEDGE_BOT_SYSTEM_MESSAGE")
+    return query(system_message=omni_knowledge_bot_system_message, user_query=omni_knowledge_bot_prompt)
 
 def nutri_scanner(nutrient_sheet_per_food_item, user_query):
     nutriscanner_prompt = os.getenv("NUTRISCANNER_PROMPT").format(user_query=user_query,nutrient_sheet_per_food_item=nutrient_sheet_per_food_item)
