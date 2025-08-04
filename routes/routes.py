@@ -174,17 +174,17 @@ async def check_skips(user_id: dict = Depends(get_current_user)):
             ]
             if len(miss_dates)>0:
                 miss_dates_str = [d.strftime("%d-%m-%Y") for d in miss_dates]
-                print("miss dates string: ",miss_dates_str)
-                comments = missy_monitor(miss_dates_str)
-                return {"Miss_Flag":True,"missy_monitor":comments}
+                try:
+                    comments = missy_monitor(miss_dates_str)
+                    return {"Miss_Flag":True,"missy_monitor":comments}
+                except Exception as e:
+                    raise ValueError("Error in missy_monitor: ",e) 
             else:
                 return {"Miss_Flag":False,"missy_monitor":"Kudos! for your discipline!"}
         except Exception as e:
             raise ValueError("Error in gap_detector: ",e)
-        response = nutri_reflector(gap_sheet=gap_sheet)
-        return {"nutri_reflector":response}
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"An error occurred review: {str(e)}"
+            detail=f"An error occurred check skips: {str(e)}"
         )
