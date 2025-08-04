@@ -83,5 +83,11 @@ def nutri_reflector(gap_sheet):
     nutri_reflector_system_message = os.getenv("NUTRI_REFLECTOR_SYSTEM_MESSAGE")
     return query(system_message=nutri_reflector_system_message, user_query=nutri_reflector_prompt)
 
+def missy_monitor(days_skipped):
+    days_string = ", ".join(str(d) for d in days_skipped)
+    missy_monitor_prompt = os.getenv("MISSY_MONITOR_PROMPT").format(days_string=days_string)
+    missy_monitor_system_message = os.getenv("MISSY_MONITOR_SYSTEM_MESSAGE")
+    return query(system_message=missy_monitor_system_message, user_query=missy_monitor_prompt)
+
 
 
