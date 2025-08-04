@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr, Field
-from typing import Optional, Dict, Any
+from typing import Optional, Dict,List, Any
 from datetime import date
 
 class UserBase(BaseModel):
@@ -11,12 +11,14 @@ class UserCreate(UserBase):
     time_frame: Optional[int] = Field(default=None, ge=1)
     start_date: Optional[date] = None
     overall_nutrient_sheet: Optional[Dict[str, Any]] = Field(default=None)
+    attendance: Optional[List[bool]] = Field(default=None)
     
 class UserInDB(UserBase):
     hashed_password: str
     time_frame: Optional[int] = Field(default=None, ge=1)
     start_date: Optional[date] = None
     overall_nutrient_sheet: Optional[Dict[str, Any]] = Field(default=None)
+    attendance: Optional[List[bool]] = Field(default=None)
 
     
 class UserPublic(UserBase):
@@ -24,3 +26,4 @@ class UserPublic(UserBase):
     time_frame: Optional[int] = Field(default=None, ge=1)
     start_date: Optional[date] = None
     overall_nutrient_sheet: Optional[Dict[str, Any]] = Field(default=None)
+    attendance: Optional[List[bool]] = Field(default=None)
