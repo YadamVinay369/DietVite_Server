@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 import os
 import json
-from utils.llm_utils.agents import nutri_orchestrator,omni_knowledge_bot,nutri_scanner,gap_detector,diet_builder,nutri_reflector,clean_json,missy_monitor
+from utils.llm_utils.agents import nutri_orchestrator,omni_knowledge_bot,nutri_scanner,gap_detector,diet_builder,nutri_reflector,clean_json,missy_monitor,calculate_diet_score_with_penalty
 
 router = APIRouter()
 
@@ -31,6 +31,7 @@ async def start(payload: TimeFrame,user_id: dict = Depends(get_current_user)):
         overall_nutrient_intake_sheet = {nutrient: [0] * payload.time_frame for nutrient in nutrients_list}
         user["overall_nutrient_sheet"] = overall_nutrient_intake_sheet
         user["attendance" ] = [False] * payload.time_frame
+        user["frequency"] = [0] * payload.time_frame
         
         await db.users.replace_one(
             {"_id": ObjectId(user_id)},
@@ -74,6 +75,7 @@ async def query(payload: Query,user_id: dict = Depends(get_current_user)):
                     user["overall_nutrient_sheet"][key][index] += val
                 index = (datetime.today()-user["start_date"]).days
                 user["attendance"][index] = True
+                user["frequency"][index] = user["frequency"][index] + 1
                 await db.users.replace_one(
                     {"_id": ObjectId(user_id)},
                     user,
@@ -146,6 +148,8 @@ async def reset(user_id: dict = Depends(get_current_user)):
         user["time_frame"] = None
         user["start_date"] = None
         user["overall_nutrient_sheet"] = None
+        user["attendance"] = None
+        user["frequency"] = None
         
         await db.users.replace_one({"_id": ObjectId(user_id)},user,upsert=True)
         
@@ -187,4 +191,31 @@ async def check_skips(user_id: dict = Depends(get_current_user)):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"An error occurred check skips: {str(e)}"
+        )
+
+@router.get('/calculate_score')
+async def score_calculator(user_id: dict = Depends(get_current_user)):
+    try:
+        user = await db.users.find_one({"_id": ObjectId(user_id)})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found.")
+        try:            
+            today = date.today()
+            start_date = user["start_date"].date()  # convert to date only
+            attendance = user["attendance"]
+            miss_dates = [
+                start_date + timedelta(days=i)
+                for i, attended in enumerate(attendance)
+                if not attended and (start_date + timedelta(days=i)) <= today
+            ]
+            frequency_of_missing = len(miss_dates)
+            overall_nutrient_intake_sheet = user["overall_nutrient_sheet"]
+            score,cheat_dates = calculate_diet_score_with_penalty(overall_nutrient_intake_sheet=overall_nutrient_intake_sheet,balanced_diet_sheet=json.loads(os.getenv("BALANCED_DIET_SHEET")),daily_frequency_list=user["frequency"],frequency_of_missing=frequency_of_missing,start_date=start_date)
+            return {"score_calculator" : score,"dates in which you have cheated" : cheat_dates}
+        except Exception as e:
+            raise ValueError("Error in score calculator: ",e)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"An error occurred review: {str(e)}"
         )
