@@ -103,9 +103,17 @@ def calculate_diet_score_with_penalty(
     high_risk_nutrients=("Calories (kcal)","Sodium (mg)","Potassium (mg)","Iron (mg)","Vitamin D (mg)"),
     cheat_threshold_over=2.0,
     cheat_threshold_freq=6,
-    max_discipline_days=60):
+    max_discipline_days=60
+):
     nutrient_scores = []
     cheat_days = set()
+    
+    if isinstance(start_date, datetime):
+        start_dt = start_date
+    elif isinstance(start_date, date):
+        start_dt = datetime.combine(start_date, datetime.min.time())
+    elif isinstance(start_date, str):
+        start_dt = datetime.strptime(start_date, "%d-%m-%Y")
 
     num_days = len(next(iter(overall_nutrient_intake_sheet.values()))) if overall_nutrient_intake_sheet else 0
 
@@ -129,9 +137,9 @@ def calculate_diet_score_with_penalty(
                     penalty_factor *= (1 + overshoot_factor ** 2)
 
                 # ✅ Mark cheating day
-                if actual / ideal_val >= cheat_threshold_over:
-                    print(f"Cheat nutrient: {nutrient}, Day: {day_idx}, Actual: {actual}, Ideal: {ideal_val}")
-                    cheat_days.add(day_idx)
+                # if actual / ideal_val >= cheat_threshold_over:
+                #     day = (start_dt + timedelta(days=day_idx)).strftime("%d-%m-%Y")
+                #     cheat_days.add(day)
 
             score = math.exp(-penalty_factor * deviation_ratio)
             day_scores.append(score)
@@ -147,8 +155,9 @@ def calculate_diet_score_with_penalty(
         freq_scores.append(daily_freq_score)
 
         if freq > cheat_threshold_freq:
-            cheat_days.add(day_idx)
-
+            day = (start_dt + timedelta(days=day_idx)).strftime("%d-%m-%Y")
+            cheat_days.add(day)
+            
     avg_freq_penalty = sum(freq_scores) / len(freq_scores) if freq_scores else 0
 
     # 3️⃣ Missing Days Penalty
@@ -163,15 +172,6 @@ def calculate_diet_score_with_penalty(
     final_score = base_score * (0.8 + 0.2 * discipline_bonus)  # 20% max bonus from discipline
     final_score *= 100
 
-    # 🔄 Convert cheat indices → dates
-    if isinstance(start_date, datetime):
-        start_dt = start_date
-    elif isinstance(start_date, date):
-        start_dt = datetime.combine(start_date, datetime.min.time())
-    elif isinstance(start_date, str):
-        start_dt = datetime.strptime(start_date, "%d-%m-%Y")
-    cheat_dates = [(start_dt + timedelta(days=i)).strftime("%d-%m-%Y") for i in sorted(cheat_days)]
-
-    return round(final_score, 2), cheat_dates
+    return round(final_score, 2), cheat_days
 
 
