@@ -12,6 +12,7 @@ class UserCreate(UserBase):
     start_date: Optional[date] = None
     overall_nutrient_sheet: Optional[Dict[str, Any]] = Field(default=None)
     attendance: Optional[List[bool]] = Field(default=None)
+    frequency: Optional[List[int]] = Field(default=None)
     
 class UserInDB(UserBase):
     hashed_password: str
@@ -19,6 +20,7 @@ class UserInDB(UserBase):
     start_date: Optional[date] = None
     overall_nutrient_sheet: Optional[Dict[str, Any]] = Field(default=None)
     attendance: Optional[List[bool]] = Field(default=None)
+    frequency: Optional[List[int]] = Field(default=None)
 
     
 class UserPublic(UserBase):
@@ -27,3 +29,4 @@ class UserPublic(UserBase):
     start_date: Optional[date] = None
     overall_nutrient_sheet: Optional[Dict[str, Any]] = Field(default=None)
     attendance: Optional[List[bool]] = Field(default=None)
+    frequency: Optional[List[int]] = Field(default=None)
